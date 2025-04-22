@@ -1,5 +1,6 @@
 import { config } from "../config/config.js";
 import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
 cloudinary.config({
   cloud_name: config.cloudinary.cloud_name,
@@ -7,16 +8,21 @@ cloudinary.config({
   api_secret: config.cloudinary.api_secret,
 });
 
-const uploadImage = async (image, folder) => {
+const uploadToCloudinary = async (filePath, folder) => {
   try {
-    const result = await cloudinary.uploader.upload(image, {
+    if (!filePath) return null;
+
+    const result = await cloudinary.uploader.upload(filePath, {
       folder,
-      use_filename: true,
     });
-    return result.url;
+
+    fs.unlinkSync(filePath);
+
+    return result;
   } catch (error) {
+    fs.unlinkSync(filePath);
     return null;
   }
 };
 
-export { uploadImage };
+export { uploadToCloudinary };
