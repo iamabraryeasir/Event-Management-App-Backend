@@ -1,7 +1,6 @@
 import createHttpError from "http-errors";
 import { ApiResponse } from "../../helpers/ApiResponse.js";
 import { Event } from "../../models/event.model.js";
-import { User } from "../../models/user.model.js";
 
 export const getEventsService = async (req, res, next) => {
   try {
@@ -52,9 +51,12 @@ export const getEventsService = async (req, res, next) => {
       hasPrevPage: page > 1,
     };
 
-    return res
-      .status(200)
-      .json(new ApiResponse(200, "Events retrieved successfully", { events, pagination }));
+    return res.status(200).json(
+      new ApiResponse(200, "Events retrieved successfully", {
+        events,
+        pagination,
+      })
+    );
   } catch (error) {
     return next(createHttpError(500, "Internal server error getting events"));
   }
