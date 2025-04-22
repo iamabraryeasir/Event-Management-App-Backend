@@ -5,7 +5,7 @@ import { uploadToCloudinary } from "../../helpers/cloudinary.js";
 
 export const createCategoryService = async (req, res, next) => {
   try {
-    const { name, description } = req.body;
+    const { name } = req.body;
 
     if (!name?.trim()) {
       return next(createHttpError(400, "Category name is required"));
@@ -17,19 +17,18 @@ export const createCategoryService = async (req, res, next) => {
       return next(createHttpError(400, "Category already exists"));
     }
 
-    // Create category data object
     const categoryData = {
       name: name.trim(),
-      description: description?.trim(),
     };
 
-    // Handle icon upload if provided
-    if (req.file) {
-      const icon = await uploadToCloudinary(req.file.path, "category-icons");
-      if (icon?.secure_url) {
-        categoryData.icon = icon.secure_url;
-      }
+    if (!req.file) {
+      return next(createHttpError(400, "Category icon is required"));
     }
+    const icon = await uploadToCloudinary(req.file.path, "category-icons");
+    if (!icon?.secure_url) {
+      return next(createHttpError(500, "Failed to upload category icon"));
+    }
+    categoryData.icon = icon.secure_url;
 
     // Create the category
     const category = await Category.create(categoryData);

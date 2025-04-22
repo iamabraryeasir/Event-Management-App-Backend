@@ -6,7 +6,7 @@ import { uploadToCloudinary } from "../../helpers/cloudinary.js";
 export const updateCategoryService = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name } = req.body;
 
     if (!id) {
       return next(createHttpError(400, "Category ID is required"));
@@ -35,10 +35,8 @@ export const updateCategoryService = async (req, res, next) => {
     // Prepare update data
     const updateData = {
       name: name.trim(),
-      description: description?.trim(),
     };
 
-    // Handle icon upload if provided
     if (req.file) {
       const icon = await uploadToCloudinary(req.file.path, "category-icons");
       if (icon?.secure_url) {
