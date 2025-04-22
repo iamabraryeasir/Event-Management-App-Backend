@@ -15,7 +15,7 @@ export const getEventsService = async (req, res, next) => {
     
     // Build match stage for filtering
     const matchStage = {};
-    if (category) matchStage.category = mongoose.Types.ObjectId(category);
+    if (category) matchStage.category = new mongoose.Types.ObjectId(category);
     if (location) matchStage.location = { $regex: location, $options: 'i' };
     
     // Get total count for pagination metadata with filters
