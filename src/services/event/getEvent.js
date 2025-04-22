@@ -20,9 +20,21 @@ export const getEventService = async (req, res, next) => {
       },
       { $unwind: "$createdBy" },
       {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "categoryInfo",
+        },
+      },
+      { $unwind: "$categoryInfo" },
+      {
         $project: {
           "createdBy._id": 1,
           "createdBy.name": 1,
+          "categoryInfo._id": 1,
+          "categoryInfo.name": 1,
+          "categoryInfo.icon": 1,
           name: 1,
           description: 1,
           date: 1,
@@ -32,7 +44,7 @@ export const getEventService = async (req, res, next) => {
         },
       },
     ]);
-    
+
     if (!event) {
       return next(createHttpError(404, "No event found"));
     }

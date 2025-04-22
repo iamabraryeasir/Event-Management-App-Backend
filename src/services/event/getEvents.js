@@ -1,6 +1,7 @@
 import createHttpError from "http-errors";
 import { ApiResponse } from "../../helpers/ApiResponse.js";
 import { Event } from "../../models/event.model.js";
+import mongoose from "mongoose";
 
 export const getEventsService = async (req, res, next) => {
   try {
@@ -9,12 +10,28 @@ export const getEventsService = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Get total count for pagination metadata
-    const totalEvents = await Event.countDocuments();
+    // Filter parameters
+    const { category, location } = req.query;
+    
+    // Build match stage for filtering
+    const matchStage = {};
+    if (category) matchStage.category = mongoose.Types.ObjectId(category);
+    if (location) matchStage.location = { $regex: location, $options: 'i' };
+    
+    // Get total count for pagination metadata with filters
+    const totalEvents = await Event.countDocuments(matchStage);
     const totalPages = Math.ceil(totalEvents / limit);
 
-    // Add pagination to aggregation pipeline
-    const events = await Event.aggregate([
+    // Build aggregation pipeline with filters
+    const pipeline = [];
+    
+    // Add match stage if filters exist
+    if (Object.keys(matchStage).length > 0) {
+      pipeline.push({ $match: matchStage });
+    }
+    
+    // Add rest of pipeline
+    pipeline.push(
       { $project: { updatedAt: 0 } },
       {
         $lookup: {
@@ -26,9 +43,21 @@ export const getEventsService = async (req, res, next) => {
       },
       { $unwind: "$createdBy" },
       {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "categoryInfo",
+        },
+      },
+      { $unwind: "$categoryInfo" },
+      {
         $project: {
           "createdBy._id": 1,
           "createdBy.name": 1,
+          "categoryInfo._id": 1,
+          "categoryInfo.name": 1,
+          "categoryInfo.icon": 1,
           name: 1,
           description: 1,
           date: 1,
@@ -38,8 +67,11 @@ export const getEventsService = async (req, res, next) => {
         },
       },
       { $skip: skip },
-      { $limit: limit },
-    ]);
+      { $limit: limit }
+    );
+
+    // Execute aggregation
+    const events = await Event.aggregate(pipeline);
 
     // Create pagination metadata
     const pagination = {
