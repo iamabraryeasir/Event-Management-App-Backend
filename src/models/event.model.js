@@ -5,6 +5,8 @@ const eventSchema = new Schema(
     name: {
       type: String,
       required: true,
+      trim: true,
+      unique: true,
     },
     description: {
       type: String,
@@ -21,7 +23,7 @@ const eventSchema = new Schema(
     category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
-      required: true
+      required: true,
     },
     banner: {
       type: String,
