@@ -2,6 +2,7 @@ import createHttpError from "http-errors";
 import { ApiResponse } from "../../helpers/ApiResponse.js";
 import { Category } from "../../models/category.model.js";
 import { uploadToCloudinary } from "../../helpers/cloudinary.js";
+import fs from "fs";
 
 export const createCategoryService = async (req, res, next) => {
   try {
@@ -14,6 +15,7 @@ export const createCategoryService = async (req, res, next) => {
     // Check if category already exists
     const existingCategory = await Category.findOne({ name: name.trim() });
     if (existingCategory) {
+      fs.unlinkSync(req.file.path);
       return next(createHttpError(400, "Category already exists"));
     }
 

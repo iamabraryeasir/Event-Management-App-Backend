@@ -3,6 +3,6 @@ import { getLandingPageData } from "../controllers/public.controller.js";
 
 const router = Router();
 
-router.get("/", getLandingPageData);
+router.get("/home-page", getLandingPageData);
 
 export default router;

@@ -15,6 +15,7 @@ export const getCategoriesService = async (req, res, next) => {
 
     // Get categories with pagination
     const categories = await Category.find()
+      .select("-createdAt -updatedAt")
       .sort({ name: 1 })
       .skip(skip)
       .limit(limit);
@@ -36,6 +37,8 @@ export const getCategoriesService = async (req, res, next) => {
       })
     );
   } catch (error) {
-    return next(createHttpError(500, "Internal server error getting categories"));
+    return next(
+      createHttpError(500, "Internal server error getting categories")
+    );
   }
 };
