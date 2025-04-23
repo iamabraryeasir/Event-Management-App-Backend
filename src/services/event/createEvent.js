@@ -8,7 +8,13 @@ import { Category } from "../../models/category.model.js";
 export const createEventService = async (req, res, next) => {
   try {
     const { name, description, date, location, category } = req.body;
-    if (!name?.trim() || !description?.trim() || !date || !location?.trim() || !category) {
+    if (
+      !name?.trim() ||
+      !description?.trim() ||
+      !date ||
+      !location?.trim() ||
+      !category
+    ) {
       return next(createHttpError(400, "All fields are required"));
     }
 
@@ -44,6 +50,6 @@ export const createEventService = async (req, res, next) => {
       .status(201)
       .json(new ApiResponse(201, "Event created successfully", event));
   } catch (error) {
-    return next(createHttpError(500, "Internal server error creating event"));
+    return next(createHttpError(500, error.message));
   }
 };

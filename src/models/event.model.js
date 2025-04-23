@@ -6,11 +6,12 @@ const eventSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      unique: true,
+      unique: [true, "Event name already exists"],
     },
     description: {
       type: String,
       required: true,
+      trim: true,
     },
     date: {
       type: Date,
@@ -19,6 +20,7 @@ const eventSchema = new Schema(
     location: {
       type: String,
       required: true,
+      trim: true,
     },
     category: {
       type: Schema.Types.ObjectId,
