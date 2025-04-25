@@ -1,6 +1,5 @@
 import express from "express";
 import { config } from "./config/config.js";
-import cookieParser from "cookie-parser";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import expressMongoSanitize from "express-mongo-sanitize";
@@ -39,7 +38,6 @@ app.use(
 // middlewares
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ limit: "20mb", extended: true }));
-app.use(cookieParser());
 app.use(expressMongoSanitize());
 app.use(helmet());
 app.use(hpp());

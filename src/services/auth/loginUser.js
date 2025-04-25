@@ -31,13 +31,6 @@ export const loginUserService = async (req, res, next) => {
       expiresIn: config.jwt.expiresIn,
     });
 
-    // set token in cookie
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: config.env === "production",
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    });
-
     const responseData = {
       id: user._id,
       name: user.name,
