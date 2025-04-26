@@ -12,9 +12,6 @@ import { globalErrorHandler } from "./middlewares/globalErrorHandler.js";
 
 const app = express();
 
-// Trust proxy - needed for rate limiting behind reverse proxies
-app.set('trust proxy', 1);
-
 // logging in development mode
 if (config.env === "development") {
   app.use(morgan("dev"));
